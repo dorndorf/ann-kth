@@ -32,13 +32,13 @@ def phi_dev(x):
     return (1+phi_function(x))*(1-phi_function(x))/2
 
 num_hidden = 4
-W = np.random.normal(0.0, 1, size=(3, patterns.shape[0]))
-V = np.random.normal(0.0, 1, size=(targets.shape[0], 3+1))
+W = np.random.normal(0.0, 1, size=(num_hidden, patterns.shape[0]))
+V = np.random.normal(0.0, 1, size=(targets.shape[0], num_hidden+1))
 ndata = patterns.shape[1]
 alpha = 0.9
 theta = 1.0
 psi = 1.0
-epochs = 200
+epochs = 1
 lr = 0.01
 
 for ep in range(epochs):
@@ -55,18 +55,18 @@ for ep in range(epochs):
 
     ##Backward Pass
     delta_o = (out - targets) * phi_dev(out)
-    #print("Delta_o:{}".format(delta_o))
-    delta_h = (np.matmul(np.transpose(V), delta_o) * phi_dev(hout))[:-1, :]
-    #print("Delta_h:{}".format(delta_h))
+    print("Delta_o:{}".format(delta_o.shape))
+    delta_h = (np.matmul(np.transpose(V), delta_o) * phi_dev(hout))[:num_hidden, :]
+    print("Delta_h:{}".format(delta_h.shape))
 
     ## New Learning Rate
     theta = alpha*theta - (1 - alpha) * np.matmul(delta_h, np.transpose(patterns))
     psi = alpha*psi - (1 - alpha) * np.matmul(delta_o, np.transpose(hout))
 
     delta_W = - lr * theta * np.matmul(delta_h, np.transpose(patterns))
-    #print("Delta_W:{}".format(delta_W))
+    print("Delta_W:{}".format(delta_W.shape))
     delta_V = - lr * psi * np.matmul(delta_o, np.transpose(hout))
-    #print("Delta_V:{}".format(delta_V))
+    print("Delta_V:{}".format(delta_V.shape))
 
     W += delta_W
     V += delta_V
