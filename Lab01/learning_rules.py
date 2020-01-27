@@ -36,12 +36,12 @@ def perceptron_rule(patterns, targets, epochs, lr, batch=True):
         #print("Epoch {}: New W is {}".format(ep, W))
     return W, loss
 
-def two_layer_backprop(patterns, targets, epochs, lr, alpha=0.9, num_hidden=64, batch=True):
-    theta = 0.0
-    psi = 0.0
+def two_layer_backprop(patterns, targets, epochs, lr, alpha=0.9, num_hidden=64, loss_name="false_class", batch=True):
+    theta = 1.0
+    psi = 1.0
     loss = []
-    W = np.random.normal(0.0, 0.1, size=(num_hidden, patterns.shape[0]))
-    V = np.random.normal(0.0, 0.1, size=(targets.shape[0], num_hidden + 1))
+    W = np.random.randn(num_hidden, patterns.shape[0]) * np.sqrt(2/(patterns.shape[0]))
+    V = np.random.randn(targets.shape[0], num_hidden + 1) * np.sqrt(2/(num_hidden + 1))
     for ep in range(epochs):
         ndata = patterns.shape[1]
         ## Forward Pass
@@ -54,30 +54,42 @@ def two_layer_backprop(patterns, targets, epochs, lr, alpha=0.9, num_hidden=64, 
         out = phi_function(oin)
         #print("Out: {}".format(out))
 
-        false_class = np.count_nonzero(np.sign(out) - targets != 0.)
-        loss.append(false_class / targets.shape[1])
+        if loss_name == "rmse":
+            loss.append(np.sqrt(np.mean((out - targets) ** 2)))
+        else:
+            false_class = np.count_nonzero(np.sign(out) - targets != 0.)
+            loss.append(false_class / targets.shape[1])
 
         ##Backward Pass
         delta_o = (out - targets) * phi_dev(out)
-        # print("Delta_o:{}".format(delta_o))
+        #print("Delta_o:{}".format(delta_o.shape))
         delta_h = (np.matmul(np.transpose(V), delta_o) * phi_dev(hout))[:-1, :]
-        # print("Delta_h:{}".format(delta_h))
+        #print("Delta_h:{}".format(delta_h.shape))
 
         ## New Learning Rate
         theta = alpha * theta - (1 - alpha) * np.matmul(delta_h, np.transpose(patterns))
         psi = alpha * psi - (1 - alpha) * np.matmul(delta_o, np.transpose(hout))
 
         delta_W = lr * theta
-        # print("Delta_W:{}".format(delta_W))
+        #print("Delta_W:{}".format(delta_W))
         delta_V = lr * psi
         # print("Delta_V:{}".format(delta_V))
 
         W += delta_W
         V += delta_V
-    return W, loss
+    return W, V, loss
 
 def phi_function(x):
     return (2 / (1 + np.exp(-x))) - 1
 
 def phi_dev(x):
     return (1+phi_function(x))*(1-phi_function(x)) * 0.5
+
+def relu(x):
+    x[x < 0.0] = 0.0
+    return x
+
+def relu_dev(x):
+    x[x < 0.0] = 0.0
+    x[x > 0.0] = 1.0
+    return x
