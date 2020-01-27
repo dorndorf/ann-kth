@@ -16,7 +16,7 @@ def delta_rule(patterns, targets, epochs, lr, batch=True):
             false_class = np.count_nonzero(np.sign(np.matmul(W, patterns)) - targets != 0.)
             loss.append(false_class / targets.shape[1])
             for sample in range(patterns.shape[1]):
-                print(patterns[:, sample].shape)
+                #print(patterns[:, sample].shape)
                 delta_W = -lr * np.dot(np.dot(W[0], patterns[:, sample]) - targets[0, sample], patterns[:, sample])
                 W += delta_W
             #print("Epoch {}: New W is {}".format(ep, W))

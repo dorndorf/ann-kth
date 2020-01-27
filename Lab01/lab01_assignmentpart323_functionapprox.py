@@ -40,7 +40,7 @@ out_p = np.ones((len(x), len(y)))
 i = 0
 for xi in range(len(x)):
     for yi in range(len(y)):
-        out_p[xi, yi] = out[0, i]
+        out_p[xi, yi] = targets[0, i]
         i += 1
 
 plt.contourf(x, y, out_p)

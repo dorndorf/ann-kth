@@ -17,8 +17,8 @@ classB[0, :] = np.random.normal(mB[0], sigmaB, n)
 classB[1, :] = np.random.normal(mB[1], sigmaB, n)
 classB[2, :] = np.ones(n)
 
-#plt.scatter(classA[0], classA[1])
-#plt.scatter(classB[0], classB[1])
+plt.scatter(classA[0], classA[1])
+plt.scatter(classB[0], classB[1])
 #plt.show()
 
 patterns = np.concatenate((classA, classB), axis=1)
@@ -35,17 +35,17 @@ W = np.random.normal(0.0, 0.1, size=(targets.shape[0], patterns.shape[0]))
 lr = 0.001
 epochs = 20
 batch = False
-W, loss_nobatch = learning_rules.delta_rule(patterns, targets, W, epochs, lr, batch)
+W, loss_nobatch = learning_rules.delta_rule(patterns, targets, epochs, lr, batch)
 
 W = np.random.normal(0.0, 0.1, size=(targets.shape[0], patterns.shape[0]))
 lr = 0.001
 epochs = 20
 batch = True
-W, loss_batch = learning_rules.delta_rule(patterns, targets, W, epochs, lr, batch)
+W, loss_batch = learning_rules.delta_rule(patterns, targets, epochs, lr, batch)
 
-plt.plot(np.arange(len(loss_batch)), loss_batch, label="delta_batch")
-plt.plot(np.arange(len(loss_nobatch)), loss_nobatch, label="delta_nobatch")
-plt.legend()
+#plt.plot(np.arange(len(loss_batch)), loss_batch, label="delta_batch")
+#plt.plot(np.arange(len(loss_nobatch)), loss_nobatch, label="delta_nobatch")
+#plt.legend()
 
 result = np.matmul(W, patterns)
 print(result)
@@ -56,7 +56,7 @@ xh = np.linspace(-1, 1)
 yh = xh * x[1]/x[0]
 #plt.plot(xh, yh+(W[0, 2]/np.linalg.norm(W)))
 
-plt.show()
+#plt.show()
 
 
 ## Perceptron
@@ -68,10 +68,10 @@ W = np.random.normal(0.0, 0.1, size=(targets.shape[0], patterns.shape[0]))
 lr = 0.001
 epochs = 1
 
-W, loss = learning_rules.perceptron_rule(patterns, targets, W, epochs, lr)
+W, loss = learning_rules.perceptron_rule(patterns, targets, epochs, lr)
 
 x = null_space(W[:, :-1])
 xh = np.linspace(-1, 1)
 yh = xh * x[1]/x[0]
 plt.plot(xh, yh+(W[0, 2]/np.linalg.norm(W)))
-#plt.show()
+plt.show()
