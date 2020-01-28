@@ -26,40 +26,39 @@ patterns = np.concatenate((classA, classB), axis=1)
 targets = np.ones(n*2)[np.newaxis, :]
 targets[0, n:] = -1
 
-indices = np.arange(patterns.shape[1])
-np.random.shuffle(indices)
-targets = targets[:, indices]
-patterns = patterns[:, indices]
+#indices = np.arange(patterns.shape[1])
+#np.random.shuffle(indices)
+#targets = targets[:, indices]
+#patterns = patterns[:, indices]
 
-lr = 0.001
-epochs = 20
+lr = 0.01
+epochs = 250
 alpha = 0.9
-num_hidden = 1000
+num_hidden = 20
 batch = False
-W, loss_nobatch = learning_rules.two_layer_backprop(patterns, targets, W, V, epochs, lr, alpha, num_hidden)
+W, V, loss_nobatch = learning_rules.two_layer_backprop(patterns, targets, epochs, lr, alpha, num_hidden)
 
 plt.plot(np.arange(len(loss_nobatch)), loss_nobatch, label="delta_nobatch")
 plt.legend()
+plt.show()
 
-result = np.matmul(W, patterns)
+decision_pattern = np.zeros((3, 400))
+meshtemp = np.meshgrid(np.linspace(-1.5, 1.5, 20), np.linspace(-1, 1, 20))
+decision_pattern[0, :] = np.array(meshtemp[0]).flatten()
+decision_pattern[1, :] = np.array(meshtemp[1]).flatten()
+decision_pattern[2, :] = np.ones(400)
+
+ndata = decision_pattern.shape[1]
+hin = np.matmul(W, decision_pattern)
+hout = np.concatenate((learning_rules.phi_function(hin), np.ones(ndata)[np.newaxis, :]))
+oin = np.matmul(V, hout)
+result = learning_rules.phi_function(oin)
+
+plt.contourf(meshtemp[0], meshtemp[1], np.sign(result).reshape(20,20), alpha=0.5)
+plt.scatter(classA[0], classA[1])
+plt.scatter(classB[0], classB[1])
+
+
 #print(result)
 
 plt.show()
-
-
-## Perceptron
-
-targets[targets == -1] = 0
-
-W = np.random.normal(0.0, 0.1, size=(targets.shape[0], patterns.shape[0]))
-
-lr = 0.001
-epochs = 1
-
-W, loss = learning_rules.perceptron_rule(patterns, targets, W, epochs, lr)
-
-x = null_space(W[:, :-1])
-xh = np.linspace(-1, 1)
-yh = xh * x[1]/x[0]
-plt.plot(xh, yh+(W[0, 2]/np.linalg.norm(W)))
-#plt.show()

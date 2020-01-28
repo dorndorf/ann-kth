@@ -1,9 +1,12 @@
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import time
 
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras import regularizers
+
 
 
 def mackey_glass_euler(n):
@@ -23,12 +26,16 @@ def mackey_glass_euler(n):
 
 full_seq = mackey_glass_euler(1510)
 
-plt.plot(full_seq)
-plt.xlabel("t")
-plt.ylabel("x(t)")
-plt.savefig("plots/mackey_glass.svg")
+### Add Noise
+amount = 0.09
+#plt.plot(full_seq)
+full_seq = np.add(full_seq, np.random.normal(0.0, amount, size=len(full_seq)))
 
-
+#plt.plot(full_seq)
+#plt.xlabel("t")
+#plt.ylabel("x(t)")
+#plt.savefig("plots/mackey_glass.svg")
+#plt.show()
 
 input, output = [], []
 
@@ -47,8 +54,10 @@ test_output = output[1000:]
 
 def build_model():
   model = keras.Sequential([
-    layers.Dense(8, activation='relu', input_shape=[5]),
-    layers.Dense(8, activation='relu'),
+    layers.Dense(4, activation='relu', input_shape=[5],
+                 kernel_regularizer=regularizers.l2(0.001)),
+    layers.Dense(4, activation='relu',
+                 kernel_regularizer=regularizers.l2(0.001)),
     layers.Dense(1)
   ])
 
@@ -59,19 +68,56 @@ def build_model():
                 metrics=['mae', 'mse'])
   return model
 
-model = build_model()
-EPOCHS = 100
-early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+epochs = []
+loss = []
+val_loss, test_loss, timepass = [], [], []
+weights = []
+for i in range(3):
 
-history = model.fit(
-  train_input, train_output,
-  epochs=EPOCHS, validation_split=0.2, verbose=2,
-  callbacks=[early_stop])
+    tic = time.perf_counter()
+    model = build_model()
+    EPOCHS = 1000
+    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 
-plt.plot(history.history["mse"])
-plt.plot(history.history["val_mse"])
-plt.ylabel('MSE [MPG]')
-plt.show()
+    history = model.fit(
+      train_input, train_output,
+      epochs=EPOCHS, validation_split=0.2, verbose=0,
+      callbacks=[early_stop])
+
+    #weights.append(model.weights[0].numpy())
+
+    toc = time.perf_counter()
+    timepass.append(toc - tic)
+
+    results = model.evaluate(test_input, test_output)
+
+    test_loss.append(results[1])
+
+    epochs.append(history.epoch[-1])
+    loss.append(history.history["mse"][-1])
+    val_loss.append(history.history["val_mse"][-1])
+
+#weights = np.array(weights).flatten()
+
+#plt.hist(weights, bins=20, range=(-1, 1))
+#plt.title("Reg. factor = 0.0001")
+#plt.xlabel("size of weights")
+#plt.ylabel("frequency")
+#plt.savefig("plots/histogram_reg00001")
+
+print("{0:.3f} ({1:.3f})".format(np.mean(np.array(loss)), np.std(np.array(loss))))
+print("{0:.3f} ({1:.3f})".format(np.mean(np.array(val_loss)), np.std(np.array(val_loss))))
+print("{0:.3f} ({1:.3f})".format(np.mean(np.array(epochs)), np.std(np.array(epochs))))
+
+print("Test {0:.3f} ({1:.3f})".format(np.mean(np.array(test_loss)), np.std(np.array(test_loss))))
+print("Time {0:.3f} ({1:.3f})".format(np.mean(np.array(timepass)), np.std(np.array(timepass))))
+
+
+#plt.plot(history.history["mse"])
+#plt.plot(history.history["val_mse"])
+#plt.ylabel('MSE [MPG]')
+#plt.show()
+
 
 pred_output = model.predict(test_input)
 
@@ -79,5 +125,7 @@ plt.plot(pred_output, label='pred')
 plt.plot(test_output, label='true')
 plt.legend()
 plt.show()
+
+
 
 
