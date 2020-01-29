@@ -1,5 +1,5 @@
 import numpy as np
-
+import plot_data
 
 def delta_rule(patterns, targets, epochs, lr, batch=True):
     W = np.random.normal(0.0, 0.1, size=(targets.shape[0], patterns.shape[0]))
@@ -8,9 +8,11 @@ def delta_rule(patterns, targets, epochs, lr, batch=True):
         for ep in range(epochs):
             false_class = np.count_nonzero(np.sign(np.matmul(W, patterns)) - targets != 0.)
             loss.append(false_class/targets.shape[1])
+            #plot_data.plot_borderlines(patterns, targets, W, loss)
             delta_W = -lr * np.matmul(np.matmul(W, patterns) - targets, patterns.transpose())
             W += delta_W
             #print("Epoch {}: New W is {}".format(ep, W))
+
     else:
         for ep in range(epochs):
             false_class = np.count_nonzero(np.sign(np.matmul(W, patterns)) - targets != 0.)
