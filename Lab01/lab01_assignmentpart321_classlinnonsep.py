@@ -31,12 +31,14 @@ targets[0, n:] = -1
 #targets = targets[:, indices]
 #patterns = patterns[:, indices]
 
-lr = 0.01
+lr = 0.001
 epochs = 250
 alpha = 0.9
-num_hidden = 20
+num_hidden = 4
 batch = False
-W, V, loss_nobatch = learning_rules.two_layer_backprop(patterns, targets, epochs, lr, alpha, num_hidden)
+#W, V, loss_nobatch = learning_rules.two_layer_backprop(patterns, targets, epochs, lr, alpha, num_hidden, batch=batch)
+W, loss_nobatch = learning_rules.delta_rule(patterns, targets, epochs, lr, batch=batch)
+
 
 plt.plot(np.arange(len(loss_nobatch)), loss_nobatch, label="delta_nobatch")
 plt.legend()
@@ -48,11 +50,13 @@ decision_pattern[0, :] = np.array(meshtemp[0]).flatten()
 decision_pattern[1, :] = np.array(meshtemp[1]).flatten()
 decision_pattern[2, :] = np.ones(400)
 
-ndata = decision_pattern.shape[1]
-hin = np.matmul(W, decision_pattern)
-hout = np.concatenate((learning_rules.phi_function(hin), np.ones(ndata)[np.newaxis, :]))
-oin = np.matmul(V, hout)
-result = learning_rules.phi_function(oin)
+#ndata = decision_pattern.shape[1]
+#hin = np.matmul(W, decision_pattern)
+#hout = np.concatenate((learning_rules.phi_function(hin), np.ones(ndata)[np.newaxis, :]))
+#oin = np.matmul(V, hout)
+#result = learning_rules.phi_function(oin)
+
+result = np.matmul(W, decision_pattern)
 
 plt.contourf(meshtemp[0], meshtemp[1], np.sign(result).reshape(20,20), alpha=0.5)
 plt.scatter(classA[0], classA[1])

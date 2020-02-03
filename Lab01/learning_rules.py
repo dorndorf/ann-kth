@@ -42,43 +42,98 @@ def two_layer_backprop(patterns, targets, epochs, lr, alpha=0.9, num_hidden=64, 
     theta = 1.0
     psi = 1.0
     loss = []
+    orig_patterns = patterns
+    orig_targets = targets
+    perc = patterns.shape[1] * 1.
+    patterns = patterns[:, :int(perc)]
+    targets = targets[:, :int(perc)]
+
     W = np.random.randn(num_hidden, patterns.shape[0]) * np.sqrt(2/(patterns.shape[0]))
     V = np.random.randn(targets.shape[0], num_hidden + 1) * np.sqrt(2/(num_hidden + 1))
-    for ep in range(epochs):
-        ndata = patterns.shape[1]
-        ## Forward Pass
-        hin = np.matmul(W, patterns)
-        # print("Shape hin: {}".format(hin))
-        hout = np.concatenate((phi_function(hin), np.ones(ndata)[np.newaxis, :]))
-        # print("Shape hout: {}".format(hout))
-        oin = np.matmul(V, hout)
-        # print("Shape oin: {}".format(oin))
-        out = phi_function(oin)
-        #print("Out: {}".format(out))
 
-        if loss_name == "rmse":
-            loss.append(np.sqrt(np.mean((out - targets) ** 2)))
-        else:
-            false_class = np.count_nonzero(np.sign(out) - targets != 0.)
-            loss.append(false_class / targets.shape[1])
+    if batch:
+        for ep in range(epochs):
+            ndata = patterns.shape[1]
+            ## Forward Pass
+            hin = np.matmul(W, patterns)
+            # print("Shape hin: {}".format(hin))
+            hout = np.concatenate((phi_function(hin), np.ones(ndata)[np.newaxis, :]))
+            # print("Shape hout: {}".format(hout))
+            oin = np.matmul(V, hout)
+            # print("Shape oin: {}".format(oin))
+            out = phi_function(oin)
+            #print("Out: {}".format(out))
 
-        ##Backward Pass
-        delta_o = (out - targets) * phi_dev(out)
-        #print("Delta_o:{}".format(delta_o.shape))
-        delta_h = (np.matmul(np.transpose(V), delta_o) * phi_dev(hout))[:-1, :]
-        #print("Delta_h:{}".format(delta_h.shape))
+            tndata = orig_patterns.shape[1]
+            thin = np.matmul(W, orig_patterns)
+            thout = np.concatenate((phi_function(thin), np.ones(tndata)[np.newaxis, :]))
+            toin = np.matmul(V, thout)
+            tout = phi_function(toin)
+            if loss_name == "rmse":
+                loss.append(np.sqrt(np.mean((tout - orig_targets) ** 2)))
+            else:
+                false_class = np.count_nonzero(np.sign(tout) - orig_targets != 0.)
+                loss.append(false_class / orig_targets.shape[1])
 
-        ## New Learning Rate
-        theta = alpha * theta - (1 - alpha) * np.matmul(delta_h, np.transpose(patterns))
-        psi = alpha * psi - (1 - alpha) * np.matmul(delta_o, np.transpose(hout))
+            ##Backward Pass
+            delta_o = (out - targets) * phi_dev(out)
+            #print("Delta_o:{}".format(delta_o.shape))
+            delta_h = (np.matmul(np.transpose(V), delta_o) * phi_dev(hout))[:-1, :]
+            #print("Delta_h:{}".format(delta_h.shape))
 
-        delta_W = lr * theta
-        #print("Delta_W:{}".format(delta_W))
-        delta_V = lr * psi
-        # print("Delta_V:{}".format(delta_V))
+            ## New Learning Rate
+            theta = alpha * theta - (1 - alpha) * np.matmul(delta_h, np.transpose(patterns))
+            psi = alpha * psi - (1 - alpha) * np.matmul(delta_o, np.transpose(hout))
 
-        W += delta_W
-        V += delta_V
+            delta_W = lr * theta
+            #print("Delta_W:{}".format(delta_W))
+            delta_V = lr * psi
+            # print("Delta_V:{}".format(delta_V))
+
+            W += delta_W
+            V += delta_V
+    else:
+        for ep in range(epochs):
+            tndata = orig_patterns.shape[1]
+            thin = np.matmul(W, orig_patterns)
+            thout = np.concatenate((phi_function(thin), np.ones(tndata)[np.newaxis, :]))
+            toin = np.matmul(V, thout)
+            tout = phi_function(toin)
+            if loss_name == "rmse":
+                loss.append(np.sqrt(np.mean((tout - orig_targets) ** 2)))
+            else:
+                false_class = np.count_nonzero(np.sign(tout) - orig_targets != 0.)
+                loss.append(false_class / orig_targets.shape[1])
+            for sample in range(patterns.shape[1]):
+                ndata = 1
+                ## Forward Pass
+                hin = np.matmul(W, patterns[:, sample, np.newaxis])
+                # print("Shape hin: {}".format(hin))
+                hout = np.concatenate((phi_function(hin), np.ones(ndata)[np.newaxis, :]))
+                # print("Shape hout: {}".format(hout))
+                oin = np.matmul(V, hout)
+                # print("Shape oin: {}".format(oin))
+                out = phi_function(oin)
+                # print("Out: {}".format(out))
+
+
+                ##Backward Pass
+                delta_o = (out - targets[:, sample]) * phi_dev(out)
+                # print("Delta_o:{}".format(delta_o.shape))
+                delta_h = (np.matmul(np.transpose(V), delta_o) * phi_dev(hout))[:-1, :]
+                # print("Delta_h:{}".format(delta_h.shape))
+
+                ## New Learning Rate
+                theta = alpha * theta - (1 - alpha) * np.matmul(delta_h, np.transpose(patterns[:, sample, np.newaxis]))
+                psi = alpha * psi - (1 - alpha) * np.matmul(delta_o, np.transpose(hout))
+
+                delta_W = lr * theta
+                # print("Delta_W:{}".format(delta_W))
+                delta_V = lr * psi
+                # print("Delta_V:{}".format(delta_V))
+
+                W += delta_W
+                V += delta_V
     return W, V, loss
 
 def phi_function(x):
