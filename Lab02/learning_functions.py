@@ -129,3 +129,21 @@ class GaussianRBF:
                 else:
                     self.means[curr_index, :] += self.som_lr * (
                             x[i] - self.means[curr_index, :])
+
+    def som_2d_neighbor_algorithm(self, x, num_neigh=2):
+        # shuffle data
+        indices = np.arange(x.shape[0])
+        np.random.shuffle(indices)
+        x = x[indices, :]
+        for i in range(x.shape[0]):
+            dk = np.linalg.norm(x[i]-self.means, 1, axis=1)
+            min_index = np.argmin(dk)
+            x_cord = int(min_index % 10)
+            y_cord = int(min_index / 10)
+            x_neighbors = np.arange(x_cord - num_neigh, x_cord + num_neigh)
+            y_neighbors = np.arange(y_cord - num_neigh, y_cord + num_neigh)
+            neigh_mesh = np.meshgrid(np.where(np.logical_and(x_neighbors >= 0, x_neighbors < 10)),
+                                     np.where(np.logical_and(y_neighbors >= 0, y_neighbors < 10)))
+            index_array = np.unique(neigh_mesh[0] + neigh_mesh[1]*10).astype(int).flatten()
+            for curr_index in index_array:
+                self.means[curr_index, :] += self.som_lr * (x[i] - self.means[curr_index, :])
