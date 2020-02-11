@@ -52,11 +52,11 @@ class GaussianRBF:
 
     def res_error(self, x, y):
         y_pred = self.forward_pass(x)
-        return np.linalg.norm(y_pred - y, 2)
+        return np.divide(np.linalg.norm(y_pred - y, 2),y.shape[0])
 
     def abs_res_error(self, x, y):
         y_pred = self.forward_pass(x)
-        return np.sum(np.abs(y_pred - y))
+        return np.divide(np.sum(np.abs(y_pred - y)),y.shape[0])
 
     def som_algorithm(self, x):
         # shuffle data
