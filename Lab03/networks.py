@@ -8,6 +8,7 @@ class HopfieldNetwork():
         self.num_pat = patterns.shape[0]
         self.num_units = patterns.shape[1]
         self.W = np.zeros((self.num_units, self.num_units))
+        self.energy = 0.0
 
     def calc_weight_matrix(self, patterns):
         #for i in range(self.W.shape[0]):
@@ -29,3 +30,11 @@ class HopfieldNetwork():
             for i in range(in_pat.shape[1]):
                     out[p, i] = np.sign(np.sum(self.W[:, i] * out[p]))
         return out
+
+    def calc_energy(self, pattern):
+        energy = 0.0
+        for i in range(self.W.shape[0]):
+            for j in range(self.W.shape[1]):
+                energy += self.W[i, j] * pattern[i] * pattern[j]
+        self.energy = energy
+        return energy
