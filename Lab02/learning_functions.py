@@ -142,8 +142,10 @@ class GaussianRBF:
             y_cord = int(min_index / 10)
             x_neighbors = np.arange(x_cord - num_neigh, x_cord + num_neigh)
             y_neighbors = np.arange(y_cord - num_neigh, y_cord + num_neigh)
-            neigh_mesh = np.meshgrid(np.where(np.logical_and(x_neighbors >= 0, x_neighbors < 10)),
-                                     np.where(np.logical_and(y_neighbors >= 0, y_neighbors < 10)))
+            neigh_mesh = np.meshgrid(x_neighbors[np.logical_and(x_neighbors >= 0, x_neighbors < 10)],
+                                     y_neighbors[np.logical_and(y_neighbors >= 0, y_neighbors < 10)])
             index_array = np.unique(neigh_mesh[0] + neigh_mesh[1]*10).astype(int).flatten()
+            if not len(index_array):
+                self.means[min_index, :] += self.som_lr * (x[i] - self.means[min_index, :])
             for curr_index in index_array:
                 self.means[curr_index, :] += self.som_lr * (x[i] - self.means[curr_index, :])

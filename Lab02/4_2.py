@@ -25,8 +25,8 @@ weights = np.ones((means.shape[0], 1))
 lr = 0.1
 first_rbf = learning_functions.GaussianRBF(means, vars, weights, lr)
 
-for i in range(20):
-    num_neigh = int(4 - 4/19 * i)
+for i in range(30):
+    num_neigh = int(3 - 3/29 * i)
     first_rbf.som_circle_neighbor_algorithm(x_train, num_neigh)
 
 output = first_rbf.winning_index(x_train)

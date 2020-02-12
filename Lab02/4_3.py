@@ -21,8 +21,8 @@ weights = np.ones((means.shape[0], 1))
 lr = 0.1
 first_rbf = learning_functions.GaussianRBF(means, vars, weights, lr)
 
-for i in range(50):
-    num_neigh = int(4 - 4/49 * i)
+for i in range(20):
+    num_neigh = int(6 - 6/19 * i)
     first_rbf.som_2d_neighbor_algorithm(x_train, num_neigh)
 
 output = first_rbf.winning_index(x_train)
@@ -35,9 +35,9 @@ y_cord = (output / 10).astype(int)
 district = np.genfromtxt('data_lab2/mpdistrict.dat', delimiter='\n')
 district_label = str(district)
 party = np.genfromtxt('data_lab2/mpparty.dat', delimiter='\n')[2:]
-party_names = ['no party', 'm', 'fp', 's', 'v', 'mp', 'kd', 'c']
+party_names = ['none', 'm', 'fp', 's', 'v', 'mp', 'kd', 'c']
 party_labels = [party_names[int(p)] for p in party]
-party_colors = ['black', 'blue', 'yellow', 'red', 'darkred', 'green', 'black', 'darkgreen']
+party_colors = ['black', 'blue', 'yellow', 'red', 'darkred', 'lightgreen', 'black', 'darkgreen']
 sex = np.genfromtxt('data_lab2/mpsex.dat', delimiter='\n')[1:]
 sex_colors = ['blue', 'green']
 sex_names = ['male', 'female']
@@ -45,8 +45,8 @@ sex_labels = [sex_names[int(p)] for p in sex]
 
 f, (ax1, ax2, ax3) = plt.subplots(1, 3)
 
-x_cord = x_cord + np.random.normal(1.0, 0.16, size=len(x_cord))
-y_cord = y_cord + np.random.normal(1.0, 0.16, size=len(y_cord))
+x_cord = x_cord + np.random.normal(1.0, 0.14, size=len(x_cord))
+y_cord = y_cord + np.random.normal(1.0, 0.14, size=len(y_cord))
 
 for x, y, party_i, lab in zip(x_cord, y_cord, party, party_labels):
     col = party_colors[int(party_i)]
@@ -58,7 +58,7 @@ ax1.set_ylim((0, 10.5))
 legend_elements = [Line2D([0], [0], marker='o', color='w', markerfacecolor=col, label=par)
                    for col, par in zip(party_colors, party_names)]
 
-ax1.legend(handles=legend_elements)
+ax1.legend(handles=legend_elements, prop={'size': 6})
 
 for x, y, sex_i, lab in zip(x_cord, y_cord, sex, sex_labels):
     col = sex_colors[int(sex_i)]
@@ -70,7 +70,7 @@ ax2.set_ylim((0, 10.5))
 legend_elements = [Line2D([0], [0], marker='o', color='w', markerfacecolor=col, label=par)
                    for col, par in zip(sex_colors, sex_names)]
 
-ax2.legend(handles=legend_elements)
+ax2.legend(handles=legend_elements, prop={'size': 6})
 
 ax3.scatter(x_cord,
                 y_cord, c=district, cmap='hsv')
