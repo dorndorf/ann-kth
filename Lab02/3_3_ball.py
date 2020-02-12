@@ -30,8 +30,8 @@ output = first_rbf.forward_pass(x_test)
 
 fig = plt.figure()
 ax = plt.axes(projection='3d')
-ax.scatter(x_test[:, 0], x_test[:, 1], y_test[:, 1], cmap='binary')
-ax.scatter(x_test[:, 0], x_test[:, 1], output[:, 1], cmap='binary')
+ax.scatter(x_test[:, 0], x_test[:, 1], y_test[:, 0], cmap='binary')
+ax.scatter(x_test[:, 0], x_test[:, 1], output[:, 0], cmap='binary')
 
 plt.show()
 
