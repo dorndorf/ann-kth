@@ -69,6 +69,7 @@ class HopfieldNetwork():
         for i in range(self.W.shape[0]):
             for j in range(self.W.shape[1]):
                 energy += self.W[i, j] * pattern[i] * pattern[j]
+        energy= -energy
         self.energy = energy
         return energy
 
