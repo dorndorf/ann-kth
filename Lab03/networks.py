@@ -27,8 +27,8 @@ class HopfieldNetwork():
         #    for j in range(self.W.shape[1]):
         #        self.W[i, j] = np.sum(patterns[:, i] * patterns[:, j]) / self.num_pat
         #self.W = np.matmul(patterns.transpose(), patterns) / self.num_pat # Denominator should be the number of units. I am not sure.
-        #self.W = np.matmul(patterns.transpose(), patterns)/self.num_units
-        self.W = np.matmul(patterns.transpose(), patterns)
+        self.W = np.matmul(patterns.transpose(), patterns)/self.num_units
+
 
     def random_one_update(self,in_pat):
         out = np.copy(in_pat)
@@ -41,7 +41,7 @@ class HopfieldNetwork():
         out = np.zeros(in_pat.shape)
         for p in range(in_pat.shape[0]):
             for i in range(in_pat.shape[1]):
-                out[p, i] = np.sign(np.sum(self.W[i, :] * in_pat[p]))
+                out[p, i] = sign(np.sum(self.W[i, :] * in_pat[p]))
         return out
 
     def synchr_one_update(self, in_pat): #synchronous also called simultaneous
@@ -54,7 +54,7 @@ class HopfieldNetwork():
     def asynchr_one_update(self, in_pat): #asynchronous also called sequential
         out = np.copy(in_pat)
         for i in range(in_pat.shape[0]):
-                    out[i] = sign(np.sum(self.W[i, :] * out))
+            out[i] = sign(np.sum(self.W[i, :] * out))
         return out
 
     def asynchr_update(self, in_pat): #asynchronous also called sequential
