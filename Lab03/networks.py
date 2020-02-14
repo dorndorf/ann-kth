@@ -1,5 +1,4 @@
 import numpy as np
-import random
 
 def sign(x):
     if x>=0:
