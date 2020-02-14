@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 def sign(x):
     if x>=0:
@@ -21,7 +22,7 @@ class HopfieldNetwork():
     def set_weight_matrix(self, weight_matrix):
         assert self.W.shape == weight_matrix.shape, "The weight matrix you provided has the wrong shape."
         self.W = weight_matrix
-
+        
     def calc_weight_matrix(self, patterns):
         #for i in range(self.W.shape[0]):
         #    for j in range(self.W.shape[1]):
@@ -30,13 +31,26 @@ class HopfieldNetwork():
         #self.W = np.matmul(patterns.transpose(), patterns)/self.num_units
         self.W = np.matmul(patterns.transpose(), patterns)
 
+    def random_one_update(self,in_pat):
+        out = np.copy(in_pat)
+        for i in range(in_pat.shape[0]):
+            j = np.random.randint(0,in_pat.shape[0])
+            out[j] = sign(np.sum(self.W[j, :] * out))
+        return out
 
     def synchr_update(self, in_pat): #synchronous also called simultaneous
         out = np.zeros(in_pat.shape)
         for p in range(in_pat.shape[0]):
             for i in range(in_pat.shape[1]):
-                out[p, i] = np.sign(np.sum(self.W[:, i] * in_pat[p]))
+                out[p, i] = np.sign(np.sum(self.W[i, :] * in_pat[p]))
         return out
+
+    def synchr_one_update(self, in_pat): #synchronous also called simultaneous
+        out = np.zeros(in_pat.shape)
+        for i in range(in_pat.shape[0]):
+            out[i] = sign(np.sum(self.W[i, :] * in_pat))
+        return out
+    
 
     def asynchr_one_update(self, in_pat): #asynchronous also called sequential
         out = np.copy(in_pat)
