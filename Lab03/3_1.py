@@ -19,11 +19,11 @@ x3d = np.array([1,  1,  1, -1, 1,  1, -1,  1])
 xd = np.concatenate((x1d, x2d, x3d)).reshape(-1, len(x1))
 
 max_iter=20
-x_before=xd
 
 #check convergence
+x_before=xd
 for i in range(max_iter):
-    x_after = hopf1.asynchr_update(xd)
+    x_after = hopf1.synchr_update(x_before)
     if np.all(x_after==x_before):
         print('iterations=',i+1)
         break
@@ -48,10 +48,10 @@ x2m = np.array([1, 1, 1, 1, 1,  1, -1, -1])
 x3m = np.array([1,  -1,  -1, 1, 1,  1, -1,  1])
 
 xm = np.concatenate((x1m, x2m, x3m)).reshape(-1, len(x1))
-x_before=xm
 
+x_before=xm
 for i in range(max_iter):
-    x_after = hopf1.asynchr_update(xm)
+    x_after = hopf1.synchr_update(x_before)
     if np.all(x_after==x_before):
         print('iterations=',i+1)
         break
@@ -65,28 +65,6 @@ for i in range(x_after.shape[0]):
         print( 'new pattern and x',i+1, 'are same')
     else:
         print( 'new pattern and x',i+1, 'are not same')
-
-'''
-#results
-#Did all the patterns converge towards stored patterns?
-iterations= 2
-[[-1 -1  1 -1  1 -1 -1  1]
- [-1  1 -1 -1 -1  1 -1 -1]
- [-1  1  1 -1 -1  1 -1  1]]
-new pattern and x 1 are same
-new pattern and x 2 are not same
-new pattern and x 3 are same
-
-#make the starting pattern even more dissimilar to the stored ones
-iterations= 2
-[[ 1  1  1  1  1 -1  1  1]
- [ 1  1  1  1  1  1  1 -1]
- [ 1 -1 -1  1  1 -1  1 -1]]
-new pattern and x 1 are not same
-new pattern and x 2 are not same
-new pattern and x 3 are not same
-
-'''
 
 
 
