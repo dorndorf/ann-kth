@@ -6,6 +6,7 @@ def sign(x):
     else:
         return -1
 
+
 class HopfieldNetwork():
 
 
@@ -77,18 +78,20 @@ class HopfieldNetwork():
         if sp_fac > 0.0:
             self.sparse_factor = sp_fac
         normed_pattern = patterns - self.sparse_factor
-        self.sparse_W = np.matmul(normed_pattern.transpose(), normed_pattern) / self.num_pat
+        self.sparse_W = np.matmul(normed_pattern.transpose(), normed_pattern) /self.num_units# Denominator should be the number of units. I am not sure.
 
     def sparse_synchr_update(self, in_pat, bias=0.1):  # synchronous also called simultaneous
         out = np.zeros(in_pat.shape)
         for p in range(in_pat.shape[0]):
             for i in range(in_pat.shape[1]):
-                out[p, i] = 0.5 + 0.5 * np.sign(np.sum(self.sparse_W[:, i] * in_pat[p]) - bias)
+                out[p, i] = 0.5 + 0.5 * sign(np.sum(self.sparse_W[i, :] * in_pat[p]) - bias)
         return out
 
     def sparse_asynchr_update(self, in_pat, bias=0.1):  # asynchronous also called sequential
         out = np.copy(in_pat)
         for p in range(in_pat.shape[0]):
             for i in range(in_pat.shape[1]):
-                out[p, i] = 0.5 + 0.5 * np.sign(np.sum(self.sparse_W[:, i] * out[p]) - bias)
+                out[p, i] = 0.5 + 0.5 * sign(np.sum(self.sparse_W[i, :] * out[p]) - bias)
         return out
+
+
