@@ -39,8 +39,21 @@ for i in range(x_after.shape[0]):
         print( 'new pattern and x',i+1, 'are not same')
 
 
-#attractors. I do not know how to find attractors. 
+#attractors
 all_patterns = [list(i) for i in itertools.product([-1, 1], repeat=8)]
+all_patterns = np.array(all_patterns)
+for pattern in all_patterns:
+    x_before=pattern
+    for i in range(max_iter):
+        x_after = hopf1.synchr_one_update(x_before)
+        if np.all(x_after==x_before):
+            #print('iterations=',i+1)
+            if np.all(x_after==pattern):
+                 print(pattern)
+            break
+        else:
+            x_before=x_after
+            
 
 #make the starting pattern even more dissimilar to the stored ones
 x1m = np.array([1, 1,  -1, 1,  -1, -1, -1,  1])
@@ -65,12 +78,6 @@ for i in range(x_after.shape[0]):
         print( 'new pattern and x',i+1, 'are same')
     else:
         print( 'new pattern and x',i+1, 'are not same')
-
-
-
-              
-
-
 
 
 
