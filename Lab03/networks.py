@@ -22,6 +22,9 @@ class HopfieldNetwork():
     def set_weight_matrix(self, weight_matrix):
         assert self.W.shape == weight_matrix.shape, "The weight matrix you provided has the wrong shape."
         self.W = weight_matrix
+
+    def remove_weight_matrix_diag(self):
+        np.fill_diagonal(self.W, 0.0)
         
     def calc_weight_matrix(self, patterns):
         #for i in range(self.W.shape[0]):
@@ -78,7 +81,7 @@ class HopfieldNetwork():
         if sp_fac > 0.0:
             self.sparse_factor = sp_fac
         normed_pattern = patterns - self.sparse_factor
-        self.sparse_W = np.matmul(normed_pattern.transpose(), normed_pattern) /self.num_units# Denominator should be the number of units. I am not sure.
+        self.sparse_W = np.matmul(normed_pattern.transpose(), normed_pattern) / self.num_units# Denominator should be the number of units. I am not sure.
 
     def sparse_synchr_update(self, in_pat, bias=0.1):  # synchronous also called simultaneous
         out = np.zeros(in_pat.shape)
