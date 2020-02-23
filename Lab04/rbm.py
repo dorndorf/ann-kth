@@ -1,4 +1,5 @@
 from util import *
+from sklearn.metrics import mean_squared_error
 
 class RestrictedBoltzmannMachine():
     '''
@@ -85,7 +86,24 @@ class RestrictedBoltzmannMachine():
             # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
             # note that inference methods returns both probabilities and activations (samples from probablities) and you may have to decide when to use what.
 
-            # [TODO TASK 4.1] update the parameters using function 'update_params'
+            for batch_left in range(0, n_samples, self.batch_size):
+
+                batch_right = batch_left + self.batch_size - 1
+
+                v_0 = visible_trainset[batch_left:batch_right]
+                
+                _, h_0 = self.get_h_given_v(v_0)
+
+                p_vh_1, v_1 = self.get_v_given_h(h_0)
+
+                p_hv_1, _ = self.get_h_given_v(v_1)
+
+                # [TODO TASK 4.1] update the parameters using function 'update_params'
+                self.update_params(v_0, h_0, p_vh_1, p_hv_1)
+
+            reconstruct = self.get_v_given_h(self.get_h_given_v(visible_trainset)[1])[0]
+
+        
             
             # visualize once in a while when visible layer is input images
             
@@ -95,9 +113,10 @@ class RestrictedBoltzmannMachine():
 
             # print progress
             
-            if it % self.print_period == 0 :
+            #if it % self.print_period == 0 :
 
-                print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset - visible_trainset)))
+                #print ("iteration=%7d recon_loss=%4.4f"%(it, np.linalg.norm(visible_trainset -  reconstruct)))
+            print ("iteration=%7d recon_loss=%4.4f"%(it, mean_squared_error(visible_trainset, reconstruct)))
         
         return
     
@@ -118,9 +137,9 @@ class RestrictedBoltzmannMachine():
 
         # [TODO TASK 4.1] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
         
-        self.delta_bias_v += 0
-        self.delta_weight_vh += 0
-        self.delta_bias_h += 0
+        self.delta_bias_v = (1/self.batch_size) * self.learning_rate * (np.sum(v_0,axis=0) - np.sum(v_k, axis=0))
+        self.delta_weight_vh = (1/self.batch_size) * self.learning_rate * ((v_0.T @ h_0) - (v_k.T @ h_k))
+        self.delta_bias_h = (1/self.batch_size) * self.learning_rate * (np.sum(h_0,axis=0) - np.sum(h_k, axis=0))
         
         self.bias_v += self.delta_bias_v
         self.weight_vh += self.delta_weight_vh
@@ -145,9 +164,10 @@ class RestrictedBoltzmannMachine():
 
         n_samples = visible_minibatch.shape[0]
 
-        # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below) 
+        # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below)
+        p_h_given_v = sigmoid(self.bias_h + visible_minibatch @ self.weight_vh)
         
-        return np.zeros((n_samples,self.ndim_hidden)), np.zeros((n_samples,self.ndim_hidden))
+        return p_h_given_v, sample_binary(p_h_given_v)
 
 
     def get_v_given_h(self,hidden_minibatch):
@@ -167,6 +187,8 @@ class RestrictedBoltzmannMachine():
 
         n_samples = hidden_minibatch.shape[0]
 
+        support = self.bias_v + hidden_minibatch @ self.weight_vh.T
+
         if self.is_top:
 
             """
@@ -183,11 +205,14 @@ class RestrictedBoltzmannMachine():
             
         else:
                         
-            # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)             
+            # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)
+            p_v_given_h = sigmoid(support)
+            samples = sample_binary(p_v_given_h)
+             
 
             pass
         
-        return np.zeros((n_samples,self.ndim_visible)), np.zeros((n_samples,self.ndim_visible))
+        return p_v_given_h, samples
 
 
     
