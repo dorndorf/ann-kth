@@ -137,26 +137,32 @@ class DeepBeliefNet():
 
         except IOError :
 
-            # [TODO TASK 4.2] use CD-1 to train all RBMs greedily
-        
+            # [TASK 4.2] use CD-1 to train all RBMs greedily
+
             print ("training vis--hid")
             """ 
             CD-1 training for vis--hid 
-            """            
+            """
+            self.rbm_stack['vis--hid'].cd1(visible_trainset=vis_trainset, n_iterations=n_iterations)
+            p_h1, h1 = self.rbm_stack['vis--hid'].get_h_given_v(vis_trainset)
             self.savetofile_rbm(loc="trained_rbm",name="vis--hid")
 
             print ("training hid--pen")
-            self.rbm_stack["vis--hid"].untwine_weights()            
+            self.rbm_stack["vis--hid"].untwine_weights()
             """ 
             CD-1 training for hid--pen 
-            """            
-            self.savetofile_rbm(loc="trained_rbm",name="hid--pen")            
+            """
+            self.rbm_stack['hid--pen'].cd1(visible_trainset=p_h1, n_iterations=n_iterations)
+            p_h2, h2 = self.rbm_stack['hid--pen'].get_h_given_v(p_h1)
+            self.savetofile_rbm(loc="trained_rbm",name="hid--pen")
 
             print ("training pen+lbl--top")
             self.rbm_stack["hid--pen"].untwine_weights()
             """ 
             CD-1 training for pen+lbl--top 
             """
+            p_h2_label = np.concatenate((p_h2, lbl_trainset), axis=1)
+            self.rbm_stack['pen+lbl--top'].cd1(visible_trainset=p_h2_label, n_iterations=n_iterations)
             self.savetofile_rbm(loc="trained_rbm",name="pen+lbl--top")            
 
         return    
