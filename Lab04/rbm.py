@@ -96,14 +96,14 @@ class RestrictedBoltzmannMachine():
 
                 p_h_0, h_0 = self.get_h_given_v(v_0)
 
-                p_v_1, v_1 = self.get_v_given_h(p_h_0)
+                p_v_1, v_1 = self.get_v_given_h(h_0)
 
-                p_h_1, h_1 = self.get_h_given_v(p_v_1)
+                p_h_1, h_1 = self.get_h_given_v(v_1)
 
                 # [TODO TASK 4.1] update the parameters using function 'update_params'
                 self.update_params(v_0, h_0, p_v_1, p_h_1)
 
-            reconstruct = self.get_v_given_h(self.get_h_given_v(visible_trainset)[0])[0]
+            reconstruct = self.get_v_given_h(self.get_h_given_v(visible_trainset)[1])[0]
 
             # visualize once in a while when visible layer is input images
 
@@ -301,8 +301,8 @@ class RestrictedBoltzmannMachine():
 
         # [TODO TASK 4.3] find the gradients from the arguments (replace the 0s below) and update the weight and bias parameters.
 
-        self.delta_weight_h_to_v += 0
-        self.delta_bias_v += 0
+        self.delta_weight_h_to_v = (1 / self.batch_size) * self.learning_rate * (inps.T @ (trgs - preds))
+        self.delta_bias_v = (1 / self.batch_size) * self.learning_rate * (np.sum(trgs, axis=0) - np.sum(preds, axis=0))
 
         self.weight_h_to_v += self.delta_weight_h_to_v
         self.bias_v += self.delta_bias_v
@@ -322,8 +322,8 @@ class RestrictedBoltzmannMachine():
 
         # [TODO TASK 4.3] find the gradients from the arguments (replace the 0s below) and update the weight and bias parameters.
 
-        self.delta_weight_v_to_h += 0
-        self.delta_bias_h += 0
+        self.delta_weight_v_to_h = (1 / self.batch_size) * self.learning_rate * (inps.T @ (trgs - preds))
+        self.delta_bias_h = (1 / self.batch_size) * self.learning_rate * (np.sum(trgs, axis=0) - np.sum(preds, axis=0))
 
         self.weight_v_to_h += self.delta_weight_v_to_h
         self.bias_h += self.delta_bias_h
