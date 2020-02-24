@@ -241,7 +241,9 @@ class RestrictedBoltzmannMachine():
 
         # [TODO TASK 4.2] perform same computation as the function 'get_h_given_v' but with directed connections (replace the zeros below) 
 
-        return np.zeros((n_samples, self.ndim_hidden)), np.zeros((n_samples, self.ndim_hidden))
+        p_h_given_v = sigmoid(self.bias_h + visible_minibatch @ self.weight_v_to_h)
+
+        return p_h_given_v, sample_binary(p_h_given_v)
 
     def get_v_given_h_dir(self, hidden_minibatch):
 
@@ -269,19 +271,22 @@ class RestrictedBoltzmannMachine():
             to get activities. The probabilities as well as activities can then be concatenated back into a normal visible layer.
             """
 
-            # [TODO TASK 4.2] Note that even though this function performs same computation as 'get_v_given_h' but with directed connections,
+            # [TASK 4.2] Note that even though this function performs same computation as 'get_v_given_h' but with directed connections,
             # this case should never be executed : when the RBM is a part of a DBN and is at the top, it will have not have directed connections.
             # Appropriate code here is to raise an error (replace pass below)
 
-            pass
+            raise ValueError('Top should have no directed weights')
 
         else:
 
-            # [TODO TASK 4.2] performs same computaton as the function 'get_v_given_h' but with directed connections (replace the pass and zeros below)             
+            # [TASK 4.2] performs same computaton as the function 'get_v_given_h' but with directed connections (replace the pass and zeros below)
+            support = self.bias_v + hidden_minibatch @ self.weight_h_to_v
+            p_v_given_h = sigmoid(support)
+            samples = sample_binary(p_v_given_h)
 
             pass
 
-        return np.zeros((n_samples, self.ndim_visible)), np.zeros((n_samples, self.ndim_visible))
+        return p_v_given_h, samples
 
     def update_generate_params(self, inps, trgs, preds):
 

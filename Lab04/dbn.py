@@ -70,12 +70,17 @@ class DeepBeliefNet():
         # [TODO TASK 4.2] fix the image data in the visible layer and drive the network bottom to top. In the top RBM, run alternating Gibbs sampling \
         # and read out the labels (replace pass below and 'predicted_lbl' to your predicted labels).
         # NOTE : inferring entire train/test set may require too much compute memory (depends on your system). In that case, divide into mini-batches.
-        
+
+        p_h1, h1 = self.rbm_stack['vis--hid'].get_h_given_v_dir(vis)
+        p_h2, h2 = self.rbm_stack['hid--pen'].get_h_given_v_dir(p_h1)
+        p_h2_label = np.concatenate((p_h2, lbl), axis=1)
+
+        curr_v3 = np.copy(p_h2_label)
         for _ in range(self.n_gibbs_recog):
+            curr_h3, h3 = self.rbm_stack['pen+lbl--top'].get_h_given_v(curr_v3)
+            curr_v3, v3 = self.rbm_stack['pen+lbl--top'].get_v_given_h(curr_h3)
 
-            pass
-
-        predicted_lbl = np.zeros(true_lbl.shape)
+        predicted_lbl = v3[:, -self.sizes['lbl']:]
             
         print ("accuracy = %.2f%%"%(100.*np.mean(np.argmax(predicted_lbl,axis=1)==np.argmax(true_lbl,axis=1))))
         
