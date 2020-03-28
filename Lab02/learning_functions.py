@@ -1,10 +1,8 @@
 import numpy as np
 
-
 def phi_gaussian(x, my, sigma):
     r = np.linalg.norm(x-my, 2, axis=-1)
     return np.exp(-np.square(r) / (2*np.square(sigma)))
-
 
 class GaussianRBF:
 

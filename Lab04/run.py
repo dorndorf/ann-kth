@@ -3,6 +3,8 @@ from rbm import RestrictedBoltzmannMachine
 from dbn import DeepBeliefNet
 
 import sys
+import time
+
 
 if __name__ == "__main__":
 
@@ -12,7 +14,7 @@ if __name__ == "__main__":
     ''' restricted boltzmann machine '''
     
     print ("\nStarting a Restricted Boltzmann Machine..")
-
+    '''
     rbm = RestrictedBoltzmannMachine(ndim_visible=image_size[0]*image_size[1],
                                      ndim_hidden=100,
                                      is_bottom=True,
@@ -21,7 +23,7 @@ if __name__ == "__main__":
                                      n_labels=10,
                                      batch_size=20
     )
-    
+    '''
     #rbm.cd1(visible_trainset=train_imgs, n_iterations=10)
 
     #sys.exit()
@@ -29,33 +31,44 @@ if __name__ == "__main__":
     ''' deep- belief net '''
 
     print ("\nStarting a Deep Belief Net..")
-    
+
+    start_time = time.time()
+
     dbn = DeepBeliefNet(sizes={"vis":image_size[0]*image_size[1], "hid":500, "pen":500, "top":2000, "lbl":10},
                         image_size=image_size,
                         n_labels=10,
-                        batch_size=10
+                        batch_size=20
     )
     
     ''' greedy layer-wise training '''
 
-    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=1)
+    dbn.train_greedylayerwise(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=5)
 
-    #dbn.recognize(train_imgs, train_lbls)
+    print("--- Training took %s seconds ---" % (time.time() - start_time))
+
+    dbn.recognize(train_imgs, train_lbls)
     
     dbn.recognize(test_imgs, test_lbls)
 
-    """
+    '''
     for digit in range(10):
         digit_1hot = np.zeros(shape=(1,10))
         digit_1hot[0,digit] = 1
         dbn.generate(digit_1hot, name="rbms")
-    """
+    '''
+
+
+    #sys.exit()
 
     ''' fine-tune wake-sleep training '''
 
-    dbn.train_wakesleep_finetune(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=1)
+    start_time = time.time()
 
-    #dbn.recognize(train_imgs, train_lbls)
+    dbn.train_wakesleep_finetune(vis_trainset=train_imgs, lbl_trainset=train_lbls, n_iterations=5)
+
+    print("--- Finetuning took %s seconds ---" % (time.time() - start_time))
+
+    dbn.recognize(train_imgs, train_lbls)
     
     dbn.recognize(test_imgs, test_lbls)
     

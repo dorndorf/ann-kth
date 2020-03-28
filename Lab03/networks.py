@@ -30,8 +30,8 @@ class HopfieldNetwork():
         #for i in range(self.W.shape[0]):
         #    for j in range(self.W.shape[1]):
         #        self.W[i, j] = np.sum(patterns[:, i] * patterns[:, j]) / self.num_pat
-        #self.W = np.matmul(patterns.transpose(), patterns) / self.num_pat # Denominator should be the number of units. I am not sure.
-        self.W = np.matmul(patterns.transpose(), patterns)/self.num_units
+        self.W = np.matmul(patterns.transpose(), patterns) / self.num_pat # Denominator should be the number of units. I am not sure.
+        #self.W = np.matmul(patterns.transpose(), patterns)/self.num_units
 
 
     def random_one_update(self,in_pat):

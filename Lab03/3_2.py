@@ -3,7 +3,7 @@ import numpy as np
 import networks
 
 def loadData():
-    with open("pict.dat", "r") as f:
+    with open("data/pict.dat", "r") as f:
         dat = f.read().split(",")   
     return np.reshape(dat, (len(dat)//1024,1024)).astype(int)
 
@@ -19,6 +19,8 @@ p3=data[2]
 p10=data[9]
 p11=data[10]
 p = np.concatenate((p1, p2, p3)).reshape(-1, len(p1))
+
+display_pattern(p10)
 
 hopf1 = networks.HopfieldNetwork(p)
 hopf1.calc_weight_matrix(p)

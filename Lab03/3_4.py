@@ -4,7 +4,7 @@ import random
 import networks
 
 def loadData():
-    with open("pict.dat", "r") as f:
+    with open("data/pict.dat", "r") as f:
         dat = f.read().split(",")   
     return np.reshape(dat, (len(dat)//1024,1024)).astype(int)
 

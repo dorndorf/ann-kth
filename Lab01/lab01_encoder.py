@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.linalg import null_space
 import learning_rules
 
 patterns = np.ones((9, 8))

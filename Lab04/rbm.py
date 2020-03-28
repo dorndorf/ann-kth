@@ -62,7 +62,7 @@ class RestrictedBoltzmannMachine():
         self.print_period = 5000
 
         self.rf = {  # receptive-fields. Only applicable when visible layer is input data
-            "period": 5,  # iteration period to visualize
+            "period": 2,  # iteration period to visualize
             "grid": [5, 5],  # size of the grid
             "ids": np.random.randint(0, self.ndim_hidden, 25)  # pick some random hidden units
         }
@@ -84,7 +84,7 @@ class RestrictedBoltzmannMachine():
 
         for it in range(n_iterations):
 
-            # [TODO TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
+            # [TASK 4.1] run k=1 alternating Gibbs sampling : v_0 -> h_0 ->  v_1 -> h_1.
             # you may need to use the inference functions 'get_h_given_v' and 'get_v_given_h'.
             # note that inference methods returns both probabilities and activations (samples from probablities)
             # and you may have to decide when to use what.
@@ -100,7 +100,7 @@ class RestrictedBoltzmannMachine():
 
                 p_h_1, h_1 = self.get_h_given_v(v_1)
 
-                # [TODO TASK 4.1] update the parameters using function 'update_params'
+                # [TASK 4.1] update the parameters using function 'update_params'
                 self.update_params(v_0, h_0, p_v_1, p_h_1)
 
             reconstruct = self.get_v_given_h(self.get_h_given_v(visible_trainset)[1])[0]
@@ -134,7 +134,7 @@ class RestrictedBoltzmannMachine():
            all args have shape (size of mini-batch, size of respective layer)
         """
 
-        # [TODO TASK 4.1] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
+        # [TASK 4.1] get the gradients from the arguments (replace the 0s below) and update the weight and bias parameters
 
         self.delta_bias_v = (1 / self.batch_size) * self.learning_rate * (np.sum(v_0, axis=0) - np.sum(v_k, axis=0))
         self.delta_weight_vh = (1 / self.batch_size) * self.learning_rate * ((v_0.T @ h_0) - (v_k.T @ h_k))
@@ -163,7 +163,7 @@ class RestrictedBoltzmannMachine():
 
         n_samples = visible_minibatch.shape[0]
 
-        # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below)
+        # [TASK 4.1] compute probabilities and activations (samples from probabilities) of hidden layer (replace the zeros below)
         p_h_given_v = sigmoid(self.bias_h + visible_minibatch @ self.weight_vh)
 
         return p_h_given_v, sample_binary(p_h_given_v)
@@ -196,7 +196,7 @@ class RestrictedBoltzmannMachine():
             to get activities. The probabilities as well as activities can then be concatenated back into a normal visible layer.
             """
 
-            # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass below). \
+            # [TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass below). \
             # Note that this section can also be postponed until TASK 4.2, since in this task, stand-alone RBMs do not contain labels in visible layer.
 
             p_v_given_h = sigmoid(support)
@@ -206,7 +206,7 @@ class RestrictedBoltzmannMachine():
 
         else:
 
-            # [TODO TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)
+            # [TASK 4.1] compute probabilities and activations (samples from probabilities) of visible layer (replace the pass and zeros below)
             p_v_given_h = sigmoid(support)
             samples = sample_binary(p_v_given_h)
 
@@ -239,7 +239,7 @@ class RestrictedBoltzmannMachine():
 
         n_samples = visible_minibatch.shape[0]
 
-        # [TODO TASK 4.2] perform same computation as the function 'get_h_given_v' but with directed connections (replace the zeros below) 
+        # [TASK 4.2] perform same computation as the function 'get_h_given_v' but with directed connections (replace the zeros below)
 
         p_h_given_v = sigmoid(self.bias_h + visible_minibatch @ self.weight_v_to_h)
 
@@ -299,7 +299,7 @@ class RestrictedBoltzmannMachine():
            all args have shape (size of mini-batch, size of respective layer)
         """
 
-        # [TODO TASK 4.3] find the gradients from the arguments (replace the 0s below) and update the weight and bias parameters.
+        # [TASK 4.3] find the gradients from the arguments (replace the 0s below) and update the weight and bias parameters.
 
         self.delta_weight_h_to_v = (1 / self.batch_size) * self.learning_rate * (inps.T @ (trgs - preds))
         self.delta_bias_v = (1 / self.batch_size) * self.learning_rate * (np.sum(trgs, axis=0) - np.sum(preds, axis=0))
@@ -320,7 +320,7 @@ class RestrictedBoltzmannMachine():
            all args have shape (size of mini-batch, size of respective layer)
         """
 
-        # [TODO TASK 4.3] find the gradients from the arguments (replace the 0s below) and update the weight and bias parameters.
+        # [TASK 4.3] find the gradients from the arguments (replace the 0s below) and update the weight and bias parameters.
 
         self.delta_weight_v_to_h = (1 / self.batch_size) * self.learning_rate * (inps.T @ (trgs - preds))
         self.delta_bias_h = (1 / self.batch_size) * self.learning_rate * (np.sum(trgs, axis=0) - np.sum(preds, axis=0))
